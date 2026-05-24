@@ -1,4 +1,3 @@
-# classe parent pour tout le personnel de l hopital
 class HospitalStaff:
 
     def __init__(self, staff_id: str, name: str, age: int, is_active: bool):
@@ -7,7 +6,6 @@ class HospitalStaff:
         self.age       = age
         self.is_active = is_active
 
-    # affichage de base d un membre du personnel
     def __str__(self) -> str:
         status = "Actif" if self.is_active else "Inactif"
         return (
@@ -21,21 +19,16 @@ class HospitalStaff:
         return self.staff_id == other.staff_id
 
 
-# Doctor herite de HospitalStaff
 class Doctor(HospitalStaff):
 
     _doctor_count = 0
 
     def __init__(self, staff_id: str, name: str, age: int, is_active: bool,
                  specialty: str, consultation_fee: float):
-
         super().__init__(staff_id, name, age, is_active)
-
-        # attributs specifiques au medecin
         self.specialty        = specialty
         self.consultation_fee = consultation_fee
         self.appointments     = []
-
         Doctor._doctor_count += 1
 
     def __str__(self) -> str:
@@ -46,7 +39,6 @@ class Doctor(HospitalStaff):
             f"Rendez-vous: {len(self.appointments)}"
         )
 
-    # retourne le nombre de rendez-vous du medecin
     def __len__(self) -> int:
         return len(self.appointments)
 
@@ -62,12 +54,10 @@ class Doctor(HospitalStaff):
             print(f"    {i}. {appt}")
         print(f"  Total : {len(self.appointments)} rendez-vous")
 
-    # pour savoir combien de medecins ont ete enregistres
     @classmethod
     def get_doctor_count(cls) -> int:
         return cls._doctor_count
 
-    # verifie si la specialite existe dans notre systeme
     @staticmethod
     def is_valid_specialty(specialty: str) -> bool:
         valid = {
@@ -77,14 +67,12 @@ class Doctor(HospitalStaff):
         }
         return specialty.strip().lower() in valid
 
-    # resume court du medecin
     @property
     def summary(self) -> str:
         active_str = "actif" if self.is_active else "inactif"
         return f"Dr. {self.name} - {self.specialty} ({active_str}, {len(self.appointments)} rdv)"
 
 
-# classe pour un rendez-vous
 class Appointment:
 
     def __init__(self, appointment_id: str, patient_name: str, date: str,
@@ -103,8 +91,6 @@ class Appointment:
             f"{self.date} a {self.time} | Motif: {self.reason} | {urgency}"
         )
 
-
-# --- fonctions pour lire les entrees utilisateur ---
 
 def input_str(prompt: str) -> str:
     while True:
@@ -133,13 +119,13 @@ def input_float(prompt: str, min_val: float = 0.0) -> float:
         try:
             value = float(input(prompt).strip())
             if value < min_val:
-                raise ValueError(f"La valeur doit etre positive.")
+                raise ValueError("La valeur doit etre positive.")
             return value
         except ValueError as e:
             print(f"  Erreur : {e}")
 
 
-# on compare a "oui" ou "non" directement, pas bool(input())
+# Compare to "oui"/"non" — never use bool(input(...)) which is always True.
 def input_bool(prompt: str) -> bool:
     while True:
         raw = input(prompt).strip().lower()
@@ -181,22 +167,15 @@ def input_time(prompt: str) -> str:
             print(f"  Erreur : {e}")
 
 
-# --- calculs ---
-
 def calculate_appointment_cost(base_fee: float, is_urgent: bool, num_appointments: int) -> float:
-    # si c est urgent on ajoute 50%
-    urgent_surcharge = base_fee * 0.5 if is_urgent else 0.0
-    # si le medecin a deja plus de 5 rdv on ajoute 10%
+    urgent_surcharge   = base_fee * 0.5 if is_urgent else 0.0
     overload_surcharge = base_fee * 0.1 if num_appointments > 5 else 0.0
-    total = base_fee + urgent_surcharge + overload_surcharge
-    return total
+    return base_fee + urgent_surcharge + overload_surcharge
 
 
 def doctor_utilization_rate(appointments: int, max_daily: int = 10) -> float:
     return (appointments / max_daily) * 100
 
-
-# --- programme principal ---
 
 def main():
     print("=" * 60)
@@ -206,9 +185,7 @@ def main():
     doctors = []
     appointment_counter = 0
 
-    # enregistrement des medecins
     print("\nETAPE 1 - Enregistrement des medecins\n")
-
     num_doctors = input_int("Combien de medecins voulez-vous enregistrer ? (1-10) : ", 1, 10)
 
     for i in range(num_doctors):
@@ -233,17 +210,12 @@ def main():
         is_active = input_bool("  Le medecin est-il actif ? (oui/non) : ")
 
         doc = Doctor(
-            staff_id=staff_id,
-            name=name,
-            age=age,
-            is_active=is_active,
-            specialty=specialty.strip().lower(),
-            consultation_fee=fee,
+            staff_id=staff_id, name=name, age=age, is_active=is_active,
+            specialty=specialty.strip().lower(), consultation_fee=fee,
         )
         doctors.append(doc)
         print(f"\n  Medecin enregistre : {doc.summary}")
 
-    # prise de rendez-vous
     print("\n" + "=" * 60)
     print("ETAPE 2 - Prise de rendez-vous\n")
 
@@ -271,12 +243,8 @@ def main():
         appt_id = f"RDV{appointment_counter:04d}"
 
         appt = Appointment(
-            appointment_id=appt_id,
-            patient_name=patient_name,
-            date=date,
-            time=time,
-            reason=reason,
-            is_urgent=is_urgent,
+            appointment_id=appt_id, patient_name=patient_name,
+            date=date, time=time, reason=reason, is_urgent=is_urgent,
         )
         chosen.assign_appointment(appt)
 
@@ -287,7 +255,6 @@ def main():
         )
         print(f"\n  Rendez-vous {appt_id} cree. Cout estime : {cost:,.0f} FCFA")
 
-    # recap final
     print("\n" + "=" * 60)
     print("RECAPITULATIF - Medecins et Rendez-vous")
     print("=" * 60)

@@ -14,34 +14,30 @@ class Patient(Person):
 
     def __init__(self, name, age, gender, phone, temperature, pain_level, heart_rate, weight, height):
         super().__init__(name, age, gender, phone)
-        self.temperature   = temperature
-        self.pain_level    = pain_level
-        self.heart_rate    = heart_rate
-        self.weight        = weight
-        self.height        = height
-        self.patient_id    = f"PAT-{Patient._counter:04d}"
-        Patient._counter  += 1
+        self.temperature = temperature
+        self.pain_level  = pain_level
+        self.heart_rate  = heart_rate
+        self.weight      = weight
+        self.height      = height
+        self.patient_id  = f"PAT-{Patient._counter:04d}"
+        Patient._counter += 1
         self.urgency_score, self.urgency_label = self._calculate_urgency()
 
     def _calculate_urgency(self):
         score = 0
 
-        # Age
         if self.age < 5 or self.age >= 75:    score += 3
         elif self.age < 12 or self.age >= 60: score += 2
         elif self.age < 18 or self.age >= 50: score += 1
 
-        # Temperature
         if self.temperature >= 40.0:   score += 3
         elif self.temperature >= 38.5: score += 2
         elif self.temperature >= 37.5: score += 1
 
-        # Pain level
         if self.pain_level >= 8:   score += 3
         elif self.pain_level >= 5: score += 2
         elif self.pain_level >= 3: score += 1
 
-        # Heart rate
         if self.heart_rate > 130 or self.heart_rate < 45:   score += 3
         elif self.heart_rate > 110 or self.heart_rate < 55: score += 2
         elif self.heart_rate > 100 or self.heart_rate < 60: score += 1
@@ -65,8 +61,9 @@ class Patient(Person):
     def __repr__(self):
         return f"Patient({self.patient_id}, {self.name}, {self.urgency_label})"
 
+    # Reversed comparison so sorted() puts the most urgent patient first.
     def __lt__(self, other):
-        return self.urgency_score > other.urgency_score  # descending sort
+        return self.urgency_score > other.urgency_score
 
     def to_record(self):
         return (f"{self.patient_id}|{self.name}|{self.age}|{self.gender}|{self.phone}|"
